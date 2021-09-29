@@ -2,25 +2,26 @@
 #include <sstream>
 #include <string>
 
+using std::istringstream;
+using std::ostringstream;
 using std::cout;
 using std::endl;
 using std::cin;
 using std::string;
 
 
-template<class T>
+
 struct CNode
 {
-    CNode(T x)
+    CNode(string x)
     {
         value = x;
         next = prev = 0;
     }
-    T value;
-    CNode<T>* next, * prev;
+    string value;
+    CNode* next, * prev;
 };
 
-template<class T>
 class CList
 {
 public:
@@ -36,9 +37,9 @@ public:
         delete head;
     }
 
-    void push_back(T x)
+    void push_back(string x)
     {
-        CNode<T>* n = new CNode<T>(x);
+        CNode* n = new CNode(x);
         if (!nelem)
             head = tail = n;
         else
@@ -52,15 +53,15 @@ public:
 
     void pop_back()
     {
-        CNode<T>* n = tail;
+        CNode* n = tail;
         tail = tail->prev;
         delete n;
         nelem--;
     }
 
-    T& operator[](int i)
+    string& operator[](int i)
     {
-        CNode<T>* n = head;
+        CNode* n = head;
         for (int k = 0; k != i; k++)
             n = n->next;
         return n->value;
@@ -69,7 +70,7 @@ public:
     void print()
     {
         std::cout << "\n";
-        for (CNode<T>* n = head; n != 0; n = n->next)
+        for (CNode* n = head; n != 0; n = n->next)
             std::cout << n->value << " ";
     }
     int GetNumElem() {
@@ -81,15 +82,15 @@ public:
         return 0;
     }
 private:
-    CNode<T>* head, * tail;
+    CNode* head, * tail;
     int nelem;
 };
 
-template<class T, class S>
+template<class S>
 class CStack
 {
 public:
-    void push(T x)
+    void push(string x)
     {
         seq.push_back(x);
     }
@@ -103,7 +104,7 @@ public:
     bool IsEmpty() {
         return seq.IsEmpty();
     }
-    T& operator[](int i) {
+    string& operator[](int i) {
         return seq[GetNumElem() - 1 - i];
     }
     void Print() {
@@ -113,58 +114,62 @@ private:
     S seq;
 };
 
-template<class T, class S>
-void RPN(CStack<T, S>& stack, T* p, T* q);
+template<class S>
+void RPN(CStack<S>& stack, string* p, string* q);
 
 
-template<class T, class S>
-int EvaluarRPN(CStack<T, S>& stack, T* q);
+template<class S>
+int EvaluarRPN(CStack<S>& stack, string* q);
 
-template<class T, class S>
-void Ingresar(CStack<T, S>& stack, T ch);
+template<class S>
+void Ingresar(CStack<S>& stack, string ch);
 
-template<class T, class S>
-void DesplegarParentesis(CStack<T, S>& stack, T* p, T*& q);
+template<class S>
+void DesplegarParentesis(CStack<S>& stack, string* p, string*& q);
 
-template<class T>
-void Desplegar(T ch, T*& q);
 
-template<class T, class S>
-void Extraer(CStack<T, S>& stack, T*& q);
+void Desplegar(string ch, string*& q);
 
-template<class T, class S>
-char Sumar2Primeros(CStack<T, S>& stack);
+template< class S>
+void Extraer(CStack<S>& stack, string*& q);
 
-template<class T, class S>
-char Restar2Primeros(CStack<T, S>& stack);
+template<class S>
+string Sumar2Primeros(CStack<S>& stack);
 
-template<class T, class S>
-char Producto2Primeros(CStack<T, S>& stack);
+template<class S>
+string Restar2Primeros(CStack<S>& stack);
+
+template<class S>
+string Producto2Primeros(CStack<S>& stack);
 
 int main() {
-    CStack<char, CList<char>> pila1;
-    char expresionInfija[15] = { '(','3','+','5',')','*','(','7','-','4',')' };
-    
-    //{"(3+5)*(7-4)","(4*2)-(5+1)","2+(3+5)*2"};
-    char expresionPostfija[15] = {};
+    CStack<CList> pila1;
+    string expresionInfija[15] = { "(","3","+","5",")","*","(","7","-","4",")"};
+   
+    string expresionPostfija[15] = {};
     
     RPN(pila1, expresionInfija, expresionPostfija);
     
-    EvaluarRPN(pila1, expresionPostfija);
+    cout << "Evaluación: " << EvaluarRPN(pila1, expresionPostfija) << endl;
  
 }
 
-template<class T, class S>
-void RPN(CStack<T, S>& stack, T* p, T* q) {
-    T* aux = q;
-    for (; *p; p++) {
-        switch (*p) {
-        case '(': Ingresar(stack, *p); break;
-        case '+': Ingresar(stack, *p); break;
-        case '-': Ingresar(stack, *p); break;
-        case '*': Ingresar(stack, *p); break;
-        case ')': DesplegarParentesis(stack, p, q); break;
-        default: Desplegar(*p, q);
+template<class S>
+void RPN(CStack<S>& stack, string* p, string* q) {
+    string* aux = q;
+    for (; *p != ""; p++) {
+        
+        if (*p == "(") {
+            Ingresar(stack, *p);
+        }
+        else if (*p == "+" || *p == "-" || *p == "*") {
+            Ingresar(stack, *p);
+        }
+        else if (*p == ")") {
+            DesplegarParentesis(stack, p, q);
+        }
+        else {
+            Desplegar(*p, q);
         }
     }
     Extraer(stack, q);
@@ -175,20 +180,20 @@ void RPN(CStack<T, S>& stack, T* p, T* q) {
 
 }
 
-template<class T, class S>
-void Ingresar(CStack<T, S>& stack, T ch) {
+template<class S>
+void Ingresar(CStack<S>& stack, string ch) {
     stack.push(ch);
 }
 
-template<class T>
-void Desplegar(T ch, T*& q) {
+
+void Desplegar(string ch, string*& q) {
     *q = ch;
     q++;
 }
 
-template<class T, class S>
-void DesplegarParentesis(CStack<T, S>& stack, T* p, T*& q) {
-    while (stack[0] != '(') {
+template<class S>
+void DesplegarParentesis(CStack<S>& stack, string* p, string*& q) {
+    while (stack[0] != "(") {
         *q = stack[0];
         q++;
         stack.pop();
@@ -196,57 +201,85 @@ void DesplegarParentesis(CStack<T, S>& stack, T* p, T*& q) {
     stack.pop();
 }
 
-template<class T, class S>
-void Extraer(CStack<T, S>& stack, T*& q) {
+template<class S>
+void Extraer(CStack<S>& stack, string*& q) {
     for (int i = 0; i < stack.GetNumElem(); i++) {
         *q = stack[i];
         q++;
     }
     while (!stack.IsEmpty())
         stack.pop();
-    stack[0] = 0;
+    stack[0] = "";
 
 
 }
 
-template<class T, class S>
-int EvaluarRPN(CStack<T, S>& stack, T* q) {
+template<class S>
+int EvaluarRPN(CStack<S>& stack, string* q) {
     int resultado = 0;
-    for (; *q; q++) {
-        switch (*q)
-        {
-        case '+':
-            Sumar2Primeros(stack); break;
-        case '-':
-            Restar2Primeros(stack); break;
-        case '*':
-            Producto2Primeros(stack); break;
-        default:
+    for (; *q != ""; q++) {
+
+        if (*q == "+") {
+            Ingresar(stack, Sumar2Primeros(stack));
+        }
+        else if (*q == "-") {
+            Ingresar(stack, Restar2Primeros(stack));
+        }
+        else if (*q == "*") {
+            Ingresar(stack, Producto2Primeros(stack));
+        }else{
             Ingresar(stack, *q);
         }
     }
+    istringstream ultimoElem(stack[0]);
+    ultimoElem >> resultado;
     
     return resultado;
 }
 
 
-template<class T, class S>
-char Sumar2Primeros(CStack<T, S>& stack) {
-    int a = (int)stack[0] - '0';
+template<class S>
+string Sumar2Primeros(CStack<S>& stack) {
+    int a,b;
+    istringstream ch1 (stack[0]);
+    ch1 >> a;
     stack.pop();
-    int b = (int)stack[0] - '0';
+    istringstream ch2(stack[0]);
+    ch2 >> b;
     stack.pop();
-    cout << "a,b: " << a << ' ' << b << endl;
-    return 0;
+    a = b + a;
+    ostringstream resultado;
+    resultado << a;
+    return resultado.str();
 }
 
-template<class T, class S>
-char Restar2Primeros(CStack<T, S>& stack) {
-    return 0;
+template<class S>
+string Restar2Primeros(CStack<S>& stack) {
+    int a, b;
+    istringstream ch1(stack[0]);
+    ch1 >> a;
+    stack.pop();
+    istringstream ch2(stack[0]);
+    ch2 >> b;
+    stack.pop();
+    a = b - a;
+    ostringstream resultado;
+    resultado << a;
+    return resultado.str();
 }
 
-template<class T, class S>
-char Producto2Primeros(CStack<T, S>& stack) {
-    return 0;
+template<class S>
+string Producto2Primeros(CStack<S>& stack) {
+    int a, b;
+    istringstream ch1(stack[0]);
+    ch1 >> a;
+    stack.pop();
+    istringstream ch2(stack[0]);
+    ch2 >> b;
+    stack.pop();
+    a = b * a;
+    ostringstream resultado;
+    resultado << a;
+    return resultado.str();
 }
 
