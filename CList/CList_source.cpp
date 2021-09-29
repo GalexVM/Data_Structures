@@ -46,9 +46,8 @@ public:
 
     void pop_back()
     {
-        CNode* n = tail;
+        CNode<T>* n = tail;
         tail = tail->prev;
-        tail->next = 0;//?
         delete n;
         nelem--;
     }

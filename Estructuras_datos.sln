@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CVector", "CVector\CVector.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COrderedList", "COrderedList\COrderedList.vcxproj", "{E76E8F30-AF78-4C4B-AB0D-70464C03CD6B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RPN(infija-postfija)", "RPN(infija-postfija)\RPN(infija-postfija).vcxproj", "{62EC8C83-B23B-4929-AB2B-CC9DA583774E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{E76E8F30-AF78-4C4B-AB0D-70464C03CD6B}.Release|x64.Build.0 = Release|x64
 		{E76E8F30-AF78-4C4B-AB0D-70464C03CD6B}.Release|x86.ActiveCfg = Release|Win32
 		{E76E8F30-AF78-4C4B-AB0D-70464C03CD6B}.Release|x86.Build.0 = Release|Win32
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Debug|x64.ActiveCfg = Debug|x64
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Debug|x64.Build.0 = Debug|x64
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Debug|x86.ActiveCfg = Debug|Win32
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Debug|x86.Build.0 = Debug|Win32
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Release|x64.ActiveCfg = Release|x64
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Release|x64.Build.0 = Release|x64
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Release|x86.ActiveCfg = Release|Win32
+		{62EC8C83-B23B-4929-AB2B-CC9DA583774E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -71,7 +71,7 @@ public:
             addVectBack();
             m_nvect++;
         }
-        map[((m_nelemTotales - 1 + vectController) / m_size)+centerController][mod(m_nelemTotales - 1 + indexController, m_size)] = x;
+        map[((m_nelemTotales - 1 + vectController) / m_size) + centerController][mod(m_nelemTotales - 1 + indexController, m_size)] = x;
            
     }
     void print() {
