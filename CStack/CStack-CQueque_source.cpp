@@ -23,7 +23,11 @@ public:
     }
     ~CList()
     {
-        //...
+        for (; head != tail; head = head->next) {
+
+            delete head->prev;
+        }
+        delete head;
     }
 
     void push_back(T x)
@@ -42,7 +46,10 @@ public:
 
     void pop_back()
     {
-        //...
+        CNode<T>* n = tail;
+        tail = tail->prev;
+        delete n;
+        nelem--;
     }
 
     void push_front(T x)
@@ -61,7 +68,11 @@ public:
 
     void pop_front()
     {
-        //...
+        CNode* n = head;
+        head = head->next;
+        head->prev = 0;
+        delete n;
+        nelem--;
     }
 
     T& operator[](int i)

@@ -1,4 +1,5 @@
-#include <iostream>
+#include<iostream>
+
 
 template<class T>
 struct CNode
@@ -9,7 +10,7 @@ struct CNode
         next = prev = 0;
     }
     T value;
-    CNode<T>* next, * prev;
+    CNode* next, * prev;
 };
 
 template<class T>
@@ -92,38 +93,29 @@ public:
         for (CNode* n = head; n != 0; n = n->next)
             std::cout << n->value << " ";
     }
-    void print2()
-    {
-        std::cout << "\n";
-        for (int i = 0; i < nelem; i++)
-            std::cout << (*this)[i] << " ";
-    }
 
 private:
     CNode* head, * tail;
     int nelem;
 };
 
-int main()
+template<class T, class S>
+class CQueue
 {
-    CList<int> l;
-    l.push_back(2);
-    l.push_back(7);
-    l.push_back(9);
-    l.push_back(1);
-    l.push_back(3);
-    l.push_back(8);
-    l.push_front(6);
-    l.push_front(4);
+public:
+    void push(T x)
+    {
+        seq.push_back(x);
+    }
+    void pop()
+    {
+        seq.pop_front();
+    }
 
-    l.print();
-    l.print2();
+private:
+    S seq;
+};
 
-    l.pop_front();
-    l.pop_back();
+int main() {
 
-    l.print();
-    l.print2();
-
-    std::cout << "\nelem 4:" << l[4] << "\n";
 }
