@@ -72,7 +72,7 @@ public:
 
     void pop_front()
     {
-        CNode* n = head;
+        CNode<T>* n = head;
         head = head->next;
         head->prev = 0;
         delete n;
@@ -130,32 +130,36 @@ private:
 };
 
 
-template <class T, class S>
-void recorrerPatata(CQueque<T, S<T>>* queque, int hotValue);
 
 int main() {
     CQueque<int, CList<int>> papaCaliente;
     for (int i = 0; i < 5; i++)
         papaCaliente.push(i + 1);
     papaCaliente.print();
-
     int hotValue = 0;
-    cout << "\n\nIngresa un numero del 1 al "<< papaCaliente.giveNumElem() << ": ";
-    cin >> hotValue;
-    cout << "\n";
+    
+    while (papaCaliente.giveNumElem() != 1) {
+        cout << "\n\nIngresa un numero del 0 al " << papaCaliente.giveNumElem() << ": ";
+        cin >> hotValue;
+        cout << "\n";
 
 
-}
+        for (int i = 0; i < hotValue; i++) {
+            papaCaliente.push(papaCaliente.giveLastValue());
+            papaCaliente.pop();
+        }
 
-template <class T, class S>
-void recorrerPatata(CQueque<T, S<T>>* queque, int hotValue) {
-    T tempValue;
-
-    for (int i = 0; i < hotValue; i++) {
-        tempValue = queque.giveLastValue();
-        queque.pop();
-        queque.push(tempValue);
+        papaCaliente.pop();
+        papaCaliente.print();
     }
     
+    
+
 
 }
+
+
+    
+    
+
+
