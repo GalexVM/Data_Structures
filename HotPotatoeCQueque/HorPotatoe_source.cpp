@@ -1,4 +1,5 @@
 #include<iostream>
+using namespace std;
 
 
 template<class T>
@@ -35,7 +36,7 @@ public:
 
     void push_back(T x)
     {
-        CNode* n = new CNode(x);
+        CNode<T>* n = new CNode<T>(x);
         if (!nelem)
             head = tail = n;
         else
@@ -80,7 +81,7 @@ public:
 
     int& operator[](int i)
     {
-        CNode* n = head;
+        CNode<T>* n = head;
         for (int k = 0; k != i; k++)
             n = n->next;
 
@@ -90,17 +91,21 @@ public:
     void print()
     {
         std::cout << "\n";
-        for (CNode* n = head; n != 0; n = n->next)
+        for (CNode<T>* n = head; n != 0; n = n->next)
             std::cout << n->value << " ";
+    }
+    int returnNumElem()
+    {
+        return nelem;
     }
 
 private:
-    CNode* head, * tail;
+    CNode<T>* head, * tail;
     int nelem;
 };
 
 template<class T, class S>
-class CQueue
+class CQueque
 {
 public:
     void push(T x)
@@ -111,11 +116,46 @@ public:
     {
         seq.pop_front();
     }
-
+    void print() {
+        seq.print();
+    }
+    int giveNumElem() {
+        return seq.returnNumElem();
+    }
+    int giveLastValue() {
+        return seq[0];
+    }
 private:
     S seq;
 };
 
+
+template <class T, class S>
+void recorrerPatata(CQueque<T, S<T>>* queque, int hotValue);
+
 int main() {
+    CQueque<int, CList<int>> papaCaliente;
+    for (int i = 0; i < 5; i++)
+        papaCaliente.push(i + 1);
+    papaCaliente.print();
+
+    int hotValue = 0;
+    cout << "\n\nIngresa un numero del 1 al "<< papaCaliente.giveNumElem() << ": ";
+    cin >> hotValue;
+    cout << "\n";
+
+
+}
+
+template <class T, class S>
+void recorrerPatata(CQueque<T, S<T>>* queque, int hotValue) {
+    T tempValue;
+
+    for (int i = 0; i < hotValue; i++) {
+        tempValue = queque.giveLastValue();
+        queque.pop();
+        queque.push(tempValue);
+    }
+    
 
 }
