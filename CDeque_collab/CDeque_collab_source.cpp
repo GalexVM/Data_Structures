@@ -175,11 +175,11 @@ int main() {
     //deq.push_front(4);
     deq.push_front(3);
     deq.push_front(1);
-    deq.push_back(2);
-    deq.push_front(2);
-    deq.push_back(7);
-    deq.pop_front();
-    deq.pop_back();
+    //deq.push_back(2);
+    //deq.push_front(2);
+    //deq.push_back(7);
+    //deq.pop_front();
+    //deq.pop_back();
     //deq.push_front(9);
     //deq.push_back(8);
     //cout<<deq.pop_back()<<endl;
