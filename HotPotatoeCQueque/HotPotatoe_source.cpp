@@ -1,4 +1,7 @@
 #include<iostream>
+
+#include <stdlib.h>     /* srand, rand */
+#include <time.h> 
 using namespace std;
 
 
@@ -94,7 +97,7 @@ public:
         for (CNode<T>* n = head; n != 0; n = n->next)
             std::cout << n->value << " ";
     }
-    int returnNumElem()
+    int size()
     {
         return nelem;
     }
@@ -119,10 +122,10 @@ public:
     void print() {
         seq.print();
     }
-    int giveNumElem() {
-        return seq.returnNumElem();
+    int size() {
+        return seq.size();
     }
-    int giveLastValue() {
+    int front() {
         return seq[0];
     }
 private:
@@ -133,24 +136,34 @@ private:
 
 int main() {
     CQueque<int, CList<int>> papaCaliente;
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 10; i++)
         papaCaliente.push(i + 1);
     papaCaliente.print();
     int hotValue = 0;
     
-    while (papaCaliente.giveNumElem() != 1) {
-        cout << "\n\nIngresa un numero del 0 al " << papaCaliente.giveNumElem() << ": ";
+    while (papaCaliente.size() != 1) {
+        /*
+        cout << "\n\nIngresa un numero del 0 al " << papaCaliente.size() << ": ";
         cin >> hotValue;
         cout << "\n";
-
+        */
+        srand(time(NULL));
+        hotValue = rand() % papaCaliente.size();
+        cout << endl << "valor obtenido: " << hotValue << endl;
+        
 
         for (int i = 0; i < hotValue; i++) {
-            papaCaliente.push(papaCaliente.giveLastValue());
+            papaCaliente.push(papaCaliente.front());
             papaCaliente.pop();
         }
+        cout << "\nJugador " << papaCaliente.front() << " fuera!\n";
 
         papaCaliente.pop();
+        
         papaCaliente.print();
+
+        if (papaCaliente.size())
+            cout << "\nEl ganador es el jugador: " << papaCaliente.front() << endl;;
     }
     
     

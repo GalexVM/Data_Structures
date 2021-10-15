@@ -55,7 +55,7 @@ public:
     {
         CNode* n = tail;
         tail = tail->prev;
-        //delete n;
+        delete n;
         nelem--;
     }
 
