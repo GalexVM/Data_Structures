@@ -9,8 +9,6 @@ using std::endl;
 using std::cin;
 using std::string;
 
-
-
 struct CNode
 {
     CNode(string x)
@@ -162,6 +160,9 @@ template<class S>
 string Producto2Primeros(CStack<S>& stack);
 
 template<class S>
+string Division2Primeros(CStack<S>& stack);
+
+template<class S>
 string Potencia2Primeros(CStack<S>& stack);
 
 int pot(int base, int exponente);
@@ -196,7 +197,7 @@ void RPN(CStack<S>& stack, string* p, string* q) {
         if (*p == "(" ) {
             Ingresar(stack, *p);
         }
-        else if (*p == "+" || *p == "-" || *p == "*" || *p == "^") {
+        else if (*p == "+" || *p == "-" || *p == "*" || *p == "^" || *p == "/") {
             if (stack.size() == 0) {
                 Ingresar(stack, *p);
             }
@@ -245,6 +246,7 @@ bool CompararPrecedencia(string a, CStack<S>& stack) {
                 default:
                     return 1; break;
             }break;
+        case '/':
         case '*':
             switch (stack.top()->value[0]){
                 case '+':
@@ -362,6 +364,21 @@ string Producto2Primeros(CStack<S>& stack) {
     ch2 >> b;
     stack.pop();
     a = b * a;
+    ostringstream resultado;
+    resultado << a;
+    return resultado.str();
+}
+
+template<class S>
+string Division2Primeros(CStack<S>& stack) {
+    int a, b;
+    istringstream ch1(stack.top()->value);
+    ch1 >> a;
+    stack.pop();
+    istringstream ch2(stack.top()->value);
+    ch2 >> b;
+    stack.pop();
+    a = b / a;
     ostringstream resultado;
     resultado << a;
     return resultado.str();
