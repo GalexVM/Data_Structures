@@ -54,31 +54,24 @@ public:
 			map[mapSpaces] = new CPage<T>(p_size);
 			head = *(map + mapSpaces);
 		}
-			
 		//if (mapSpaces == 0)
 			//extend_map_front();
 
-		pageSpaces = mod(pageSpaces - 1, p_size);
-
+		pageSpaces = mod(pageSpaces - 1, p_size);//Reducir los espacios
 		CPage<T>* pagina = map[mapSpaces]; 
 		(*pagina)[pageSpaces] = x;
-
 		n_elem++;
 	}
 	void push_back(T x) {
 		if ((n_elem + 1 + pageSpaces) % p_size == 1 && n_elem + 1 != 1) {
 			
 			map[n_pags + mapSpaces] = new CPage<T>(p_size);
-			
 			n_pags++;
 			cout << "nueva pag agregada\n";
-			//tail = *(map + mapSpaces + n_pags);
 		}
 		
 		CPage<T>* aux = map[mapSpaces + ((n_elem + pageSpaces) / 5)];
-
 		(*aux)[(pageSpaces + n_elem) % 5] = x;
-		
 		n_elem++;
 	}
 	T pop_front() {
@@ -121,14 +114,14 @@ int main() {
 	deque1.push_back(1);
 	deque1.push_back(2);
 	deque1.push_back(3);
-	deque1.push_back(4);
+	/*deque1.push_back(4);
 	deque1.push_back(5);
 	deque1.push_back(6);
 	deque1.push_back(7);
 	deque1.push_back(8);
 	deque1.push_back(9);
 	deque1.push_back(10);
-	deque1.push_back(11);
+	deque1.push_back(11);*/
 
 	deque1.push_front(1);
 	deque1.push_front(2);
