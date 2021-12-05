@@ -7,28 +7,6 @@
 #include <thread>
 using namespace std;
 
-/*
-template<class G>
-struct Camino {
-    typedef typename G::Node    Node;
-    typedef typename G::E       E;
-
-    E distancia_total;
-    vector<Node*> nodos;
-};
-template<class G>
-struct Distancia {
-    typedef typename G::N       N;
-    typedef typename G::E       E;
-    E distancia;
-    N node;
-    Distancia(int n, E d) :node(n), distancia(d) {};
-    bool operator <(const Distancia& b) const //comparar distancias
-    {
-        return distancia > b.distancia;
-    }
-};
-*/
 template<class G>
 struct DijkstraTag
 {
@@ -59,7 +37,6 @@ struct DijkstraTag
     }
 };
 
-
 template<class G>
 struct DijkstraMap
 {
@@ -82,7 +59,16 @@ struct DijkstraMap
 
     void Print()
     {
-        cout << aNode << " -> " << bNode << ": " << minDis << endl;
+        cout << aNode << " -> " << bNode << ": " << minDis << "|";
+        typename list<Node*>::iterator it1;
+        for (it1 = minRec.begin(); it1 != minRec.end(); ++it1)
+        {
+            if(*it1)
+                cout << "--> " << (*it1)->value << " ";
+            else
+                cout << "--> " << '0' << " ";
+        }
+        cout << endl;
     }
 
 };
@@ -143,11 +129,8 @@ public:
     void BuildMap(); //Ejecuta dijkstra en cada nodo y arma
     void Dijkstra(Node *n);//Llena las etiquetas de cada nodo respecto de el seleccionado
     void AddMap(Node *n);//Agrega mapas a fullMap con la información de las etiquetas. a = n, b = x
-    void HallarPredecesor(Node* n, Node* p);
     void PrintMap();
     
-
-
     int nNodes = 0;
     deque<Node*> nodes;
     list<Map*> fullMap;
@@ -157,7 +140,6 @@ struct Coord
 {
     float x, y;
 };
-
 
 template<class _N, class _E>
 bool CGraph<_N, _E>::FindNode(N n, i& p) {
@@ -226,22 +208,19 @@ bool CGraph<_N, _E>::RemNode(N e) {
     i p;
     std::deque<j> dq;
     if (FindNode(e, p)) {
-        j it = (*p)->edges.begin();
-        cout << 'a' << endl;
-        for (; it != (*p)->edges.end(); ++it) {
+        j it = (*p)->edges.begin();  
+        for (; it != (*p)->edges.end(); ++it) 
+        {
             
             j temp = it;
             dq.push_back(temp);
             cout << 'i' << endl;
-        }
-        cout << 'a' << endl;
+        } 
         //i it2;
         typename std::deque<j>::iterator it2;
         for(it2 = dq.begin();it2 != dq.end(); ++it2)
             RemEdge((**it2)->nodes[0]->value, (**it2)->nodes[1]->value, (**it2)->value);
-        cout << 'd' << endl;
         nodes.erase(p);
-
         return true;
     }
 }
@@ -269,8 +248,6 @@ template<class _N, class _E>
 void CGraph<_N, _E>::BuildMap()
 { 
     auto i = nodes.begin();//Elegir un nodo al azar para empezar
-    //Dijkstra(*i);
-    //AddMap(*i);
     for (; i != nodes.end(); ++i)
     {
         Dijkstra(*i);
@@ -290,13 +267,9 @@ void CGraph<_N, _E>::Dijkstra(Node *n)
         (*p).cookie = true;
         auto j = (*p).edges.begin();
         for (; j != (*p).edges.end(); ++j)
-        {
             if ((*j)->nodes[0] == p || (*j)->dir == 0)//Si sale del nodo o es bidireccional
-            {
-                //cout << (*j)->nodes[0]->value << (*j)->nodes[1]->value << endl;
                 minArray.push_back(*j);//Añadir los valores de los nodos
-            }
-        }
+
         for (int i = 0; i < minArray.size(); ++i)//Mínimo provisional
         {
             if (minArray[i]->nodes[1]->cookie == 0)
@@ -307,8 +280,7 @@ void CGraph<_N, _E>::Dijkstra(Node *n)
                
         }
         for (int i = 0; i < minArray.size(); ++i)//Recorrer para obtener el mínimo
-        {
-            
+        {  
             if (minArray[i]->dir == 1)
             {
                 if(minArray[i]->value + (minArray[i]->nodes[0]->tag.pAcumulado) <
@@ -331,10 +303,7 @@ void CGraph<_N, _E>::Dijkstra(Node *n)
                 min = minArray[i];
             }
         }
-
         p = min->nodes[1];
-        //cout << "Permanente: " << p->value << endl;
-        //p->tag.Print();
         for (int i = 0; i < minArray.size(); ++i)//Eliminar min del array
         {
             if (*(minArray.begin() + i) == min)
@@ -353,25 +322,24 @@ void CGraph<_N, _E>::AddMap(Node *n)
     {
         Map* x = new Map;
         x->Set(n->value, nodes[i]->value, nodes[i]->tag.pAcumulado);//Ingresar nodo de ida, de llegada, recorrido
-        
-        /*for (int j = 0; j < nodes[i]->tag.nPasos; j++)
+        Node* p = 0;
+        for (int j = 0; j < nodes[i]->tag.nPasos; j++)
         { 
-            if (!(i == nodes[i]->tag.nPasos - 1))//primera iteración
+            if (j != 0)//No primera iteración
             {
-                Node* p = 0;
-               
-                HallarPredecesor(nodes[i - 1], p);
-               
-                x->minRec.push_front(p);
+                Node* q = 0;
+                q = p->tag.nAnterior;
+                x->minRec.push_front(q);
+                p = q;
             }
             else
             {
+               x->minRec.push_front(nodes[i]);
                x->minRec.push_front(nodes[i]->tag.nAnterior);
-            }
-                
-        }    */
-        fullMap.push_back(x);
-        
+               p = nodes[i]->tag.nAnterior;
+            }  
+        }    
+        fullMap.push_back(x);   
     }
     for (int i = 0; i < nNodes; ++i)//limpiar todos los tags y cookies
     {
@@ -379,8 +347,6 @@ void CGraph<_N, _E>::AddMap(Node *n)
         nodes[i]->cookie = 0;
     }
 }
-
-
 
 template<class _N, class _E>
 void CGraph<_N, _E>::PrintMap()
@@ -391,82 +357,26 @@ void CGraph<_N, _E>::PrintMap()
         (*it1)->Print();
     }
 }
-
 /*
-template<class _N, class _E>
-_E CGraph<_N, _E>::Distance(N a, N b)
-{
-    //Encontrar nodos solicitados
-    i it;
-    Node* n1 = 0;
-    Node* n2 = 0;
-    Edge* minEd = 0;//Apuntará a la arista menor
-    for (it = nodes.begin(); it != nodes.end(); ++it)
-    {
-        if ((*it)->value == a)
-            n1 = *it;
-        if ((*it)->value == b)
-            n2 = *it;
-    }
-
-    //Nodos al rededor
-    j it1;
-    for (it1 = n1->edges.begin(); it1 != n1->edges.end(); ++it1)
-    {
-        if ((*it1)->cookie == false)
-            minEd = *it1;//Menor provisional
-        if ((*it1)->nodes[1] == n2)//Comprobar si B es adyacente
-            return (*it1)->value;
-
-    }
-
-    //No se encontró, entonces
-    //  Viajar hasta la arista con menor peso que tenga "cookie" en falso
-    //bool isWay = 0;//Hay camino o se está estancado
-    for (it1 = n1->edges.begin(); it1 != n1->edges.end(); ++it1)
-    {
-        if ((*it1)->cookie == false && (*it1)->value < minEd->value)
-        {
-            //isWay = true;
-            minEd = *it1;
-        }
-            
-    }
-    if (!minEd)//Si se atascó (bucle o camino sin salida)
-    {
-       
-    }
-   
-
-    
-}
-*/
-
-template<class _N, class _E>
-void CGraph<_N, _E>::HallarPredecesor(Node* n, Node* p)
-{
-    p = n->tag.nAnterior;
-}
-
 class CGraphCity : public CGraph<Coord, int>
 {
     // algoritmos optimizados con coordenas
-    /*
-     busquedas direccionada
-     precalculo
-     etc
-     */
+    
+     //busquedas direccionada
+     //precalculo
+     //etc
+     
 };
 
 class CGraphChar : public CGraph<char, int>
 {
     // algoritmos no optimizados
-    void Print();
-    /*
-     implementar dikjstra, etc
-     */
+    //void Print();
+    
+    // implementar dikjstra, etc
+     
 };
-
+*/
 int main()
 {
     CGraph<int, int> g1;
