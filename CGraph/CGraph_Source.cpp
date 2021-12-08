@@ -1,11 +1,12 @@
 #include<iostream>
 #include<deque>
-#include<queue>
 #include<list>
 #include<vector>
-#include <algorithm>
 #include <thread>
 using namespace std;
+
+int nThreads = 4; //Trabajaré con 4 porque '::hardware_concurrency()' me da resultados diferentes en diferentes
+                    //compiladores
 
 template<class G>
 struct DijkstraTag
@@ -82,9 +83,19 @@ struct CNode
 
     N value;
     std::list<Edge*> edges;
-    Tag tag;
-    bool cookie = 0;
-    CNode(N valor) :value(valor) {};
+    deque<Tag*> tag;
+    deque<bool> cookie;
+    //Tag tag;
+    //bool cookie = 0;
+    CNode(N valor) :value(valor) 
+    {
+        for (int i = 0; i < nThreads; ++i)
+        {
+            Tag* tg = new Tag;
+            tag.push_back(tg);
+            cookie.push_back(0);
+        }
+    };
 };
 
 template<class G>
@@ -126,10 +137,11 @@ public:
     bool RemNode(N n);
     void PrintNodes();
     void PrintEdges();
-    void BuildMap(); //Ejecuta dijkstra en cada nodo y arma
-    void Dijkstra(Node *n);//Llena las etiquetas de cada nodo respecto de el seleccionado
-    void AddMap(Node *n);//Agrega mapas a fullMap con la información de las etiquetas. a = n, b = x
+    void BuildMap(int a); //Ejecuta dijkstra en cada nodo y arma
+    void Dijkstra(Node *n, int c);//Llena las etiquetas de cada nodo respecto de el seleccionado
+    void AddMap(Node *n, int c);//Agrega mapas a fullMap con la información de las etiquetas. a = n, b = x
     void PrintMap();
+    void GetMinDistance(N a, N b);
     
     int nNodes = 0;
     deque<Node*> nodes;
@@ -187,7 +199,6 @@ bool CGraph<_N, _E>::InsEdge(N a, N b, E e, bool d) {
             (*p1)->edges.push_back(ed);
             (*p2)->edges.push_back(ed);           
             return 1;
-        
     }
     return 0;
 }
@@ -211,7 +222,6 @@ bool CGraph<_N, _E>::RemNode(N e) {
         j it = (*p)->edges.begin();  
         for (; it != (*p)->edges.end(); ++it) 
         {
-            
             j temp = it;
             dq.push_back(temp);
             cout << 'i' << endl;
@@ -245,66 +255,75 @@ void CGraph<_N, _E>::PrintEdges() {
 }
 
 template<class _N, class _E>
-void CGraph<_N, _E>::BuildMap()
-{ 
-    auto i = nodes.begin();//Elegir un nodo al azar para empezar
-    for (; i != nodes.end(); ++i)
+void CGraph<_N, _E>::BuildMap(int a)
+{
+    int ini, end;
+    ini = nNodes / nThreads * (a - 1);
+    if (nNodes / nThreads * nThreads != nNodes && a == 4)//Si la división no es exacta y ya es la 4ta parte
+        end = nNodes;
+    else
+        end = nNodes / nThreads * a;
+
+    i it1 = nodes.begin() + ini;//Acceder por partes (4 threads)
+    for (; it1 != nodes.begin() + end; ++it1)
     {
-        Dijkstra(*i);
-        AddMap(*i);
+        Dijkstra(*it1, a-1);
+        AddMap(*it1, a-1);
     }
-    
 }
 template<class _N, class _E>
-void CGraph<_N, _E>::Dijkstra(Node *n)
+void CGraph<_N, _E>::Dijkstra(Node *n, int c)
 {
-    Node* p = n;
+    Node* p = n;//pivot
     Edge* min = 0;
-    (*p).tag.Reset();
+    (*p).tag[c]->Reset();//poner todos los tags a 0
     deque<Edge*> minArray;
-    for (int x  = 0; x < nNodes-1; ++x )
+    
+    for (int x  = 0; x < nNodes-1; ++x )//pasos para terminar
     {
-        (*p).cookie = true;
+        (*p).cookie[c] = true;
         auto j = (*p).edges.begin();
         for (; j != (*p).edges.end(); ++j)
             if ((*j)->nodes[0] == p || (*j)->dir == 0)//Si sale del nodo o es bidireccional
                 minArray.push_back(*j);//Añadir los valores de los nodos
-
-        for (int i = 0; i < minArray.size(); ++i)//Mínimo provisional
+        
+        for (unsigned int i = 0; i < minArray.size(); ++i)//Mínimo provisional
         {
-            if (minArray[i]->nodes[1]->cookie == 0)
+            if (minArray[i]->nodes[1]->cookie[c] == 0)
             {
                 min = minArray[i];
                 break;
-            }
-               
+            }     
         }
-        for (int i = 0; i < minArray.size(); ++i)//Recorrer para obtener el mínimo
+        for (unsigned int i = 0; i < minArray.size(); ++i)//Etiquetar
         {  
             if (minArray[i]->dir == 1)
             {
-                if(minArray[i]->value + (minArray[i]->nodes[0]->tag.pAcumulado) <
-                    minArray[i]->nodes[1]->tag.pAcumulado ||
-                    (minArray[i]->nodes[1]->tag.pAcumulado == 0 &&
+                if(minArray[i]->value + (minArray[i]->nodes[0]->tag[c]->pAcumulado) <
+                    minArray[i]->nodes[1]->tag[c]->pAcumulado ||
+                    (minArray[i]->nodes[1]->tag[c]->pAcumulado == 0 &&
                     minArray[i]->nodes[1] != n)
                     )//Solo setear el tag si va a ser para un camino más corto, o si hay un 0
-                    minArray[i]->nodes[1]->tag.Set(minArray[i]->value + (minArray[i]->nodes[0]->tag.pAcumulado),
+                    minArray[i]->nodes[1]->tag[c]->Set(minArray[i]->value + (minArray[i]->nodes[0]->tag[c]->pAcumulado),
                                                     minArray[i]->nodes[0],
-                                                    1 + (minArray[i]->nodes[0]->tag.nPasos));
+                                                    1 + (minArray[i]->nodes[0]->tag[c]->nPasos));
             }
             else
             {
                 //...
             }
-            if (minArray[i] &&
-                minArray[i]->nodes[1]->tag.pAcumulado < min->nodes[1]->tag.pAcumulado &&
-                minArray[i]->nodes[1]->cookie == 0)
+            
+            if (min && minArray[i] &&
+                minArray[i]->nodes[1]->tag[c]->pAcumulado < min->nodes[1]->tag[c]->pAcumulado &&
+                minArray[i]->nodes[1]->cookie[c] == 0)//Obtener mínimo
             {
                 min = minArray[i];
             }
+           
         }
-        p = min->nodes[1];
-        for (int i = 0; i < minArray.size(); ++i)//Eliminar min del array
+        if(min)
+            p = min->nodes[1];//Avanzar pivot al mínimo
+        for (unsigned int i = 0; i < minArray.size(); ++i)//Eliminar min del array
         {
             if (*(minArray.begin() + i) == min)
             {
@@ -312,39 +331,41 @@ void CGraph<_N, _E>::Dijkstra(Node *n)
                 break;
             }   
         }
+       
     }
 
 }
 template<class _N, class _E>
-void CGraph<_N, _E>::AddMap(Node *n)
+void CGraph<_N, _E>::AddMap(Node *n, int c)
 {
+   
     for (int i = 0; i < nNodes; ++i)//Agregar a fullmap
     {
         Map* x = new Map;
-        x->Set(n->value, nodes[i]->value, nodes[i]->tag.pAcumulado);//Ingresar nodo de ida, de llegada, recorrido
+        x->Set(n->value, nodes[i]->value, nodes[i]->tag[c]->pAcumulado);//Ingresar nodo de ida, de llegada, recorrido
         Node* p = 0;
-        for (int j = 0; j < nodes[i]->tag.nPasos; j++)
+        for (int j = 0; j < nodes[i]->tag[c]->nPasos; j++)
         { 
             if (j != 0)//No primera iteración
             {
                 Node* q = 0;
-                q = p->tag.nAnterior;
+                q = p->tag[c]->nAnterior;
                 x->minRec.push_front(q);
                 p = q;
             }
             else
             {
                x->minRec.push_front(nodes[i]);
-               x->minRec.push_front(nodes[i]->tag.nAnterior);
-               p = nodes[i]->tag.nAnterior;
+               x->minRec.push_front(nodes[i]->tag[c]->nAnterior);
+               p = nodes[i]->tag[c]->nAnterior;
             }  
         }    
         fullMap.push_back(x);   
     }
     for (int i = 0; i < nNodes; ++i)//limpiar todos los tags y cookies
     {
-        nodes[i]->tag.Reset();
-        nodes[i]->cookie = 0;
+        nodes[i]->tag[c]->Reset();
+        nodes[i]->cookie[c] = 0;
     }
 }
 
@@ -356,6 +377,27 @@ void CGraph<_N, _E>::PrintMap()
     {
         (*it1)->Print();
     }
+}
+
+template<class _N, class _E>
+void CGraph<_N, _E>::GetMinDistance(N a, N b)
+{
+    typename list<Map*>::iterator it = fullMap.begin();
+    for (; it != fullMap.end();++it)
+    {
+        if ((*it)->aNode == a && (*it)->bNode == b)
+        {
+            cout << "La distancia minima entre " << a << " y " << b << " es " << (*it)->minDis;
+            break;
+        }
+
+    }
+    cout << "\nEl recorrido minimo es: \n";
+    typename list<Node*>::iterator it2 = (*it)->minRec.begin();
+    for (; it2 != (*it)->minRec.end(); ++it2)
+    {
+        cout << " -> " << (*it2)->value;
+    }cout << endl;
 }
 /*
 class CGraphCity : public CGraph<Coord, int>
@@ -377,6 +419,7 @@ class CGraphChar : public CGraph<char, int>
      
 };
 */
+
 int main()
 {
     CGraph<int, int> g1;
@@ -399,8 +442,28 @@ int main()
     g1.PrintNodes();
     cout << endl;
     g1.PrintEdges();
-    g1.BuildMap();
+   
+    
+    vector<thread> ths(nThreads);
+    
+    int i, j;
+    i = 0; 
+    for (; i < nThreads; ++i)
+    {
+        j = i + 1;
+        ths[i] = thread(
+            [g = &g1, j]()
+            {
+                g->BuildMap(j);
+            }
+        );
+    }
+    i = 0;
+    for (; i < nThreads; ++i)
+    {
+        ths[i].join();
+    }
     g1.PrintMap();
- 
+    g1.GetMinDistance(4, 1);
 
 }
