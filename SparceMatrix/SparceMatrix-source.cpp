@@ -23,7 +23,7 @@ private:
 	
 public:
 	bool dirección;
-	SparceMatrixList();
+	SparceMatrixList(int n);
 	~SparceMatrixList();
 	bool FindNode(SparceMatrixNode<T>* n, SparceMatrixNode<T>**& p);
 	bool FindNode(int c, SparceMatrixNode<T>**& p);
@@ -55,14 +55,14 @@ SparceMatrix<SzX, SzY, T, N>::SparceMatrix()
 {
 	for (int i = 0; i < SzX; ++i)
 	{
-		edgeX.push_back(new SparceMatrixList<T>);
-		edgeX[i].dirección = 0;
+		SparceMatrixList<T>* a = new SparceMatrixList<T>(0);
+		edgeX.push_back(*a);
 	}
 		
 	for (int i = 0; i < SzY; ++i)
 	{
-		edgeY.push_back(new SparceMatrixList<T>);
-		edgeX[i].dirección = 1;
+		SparceMatrixList<T>* a = new SparceMatrixList<T>(1);
+		edgeY.push_back(*a);
 	}
 		
 }
@@ -103,7 +103,7 @@ void SparceMatrix<SzX, SzY, T, N>::Set(int c1, int c2, T v)
 	{
 		if (edgeX[c2].FindNode(c1, p))
 		{
-			cout << "a " << v << endl;
+			//cout << "a " << v << endl;
 			(*p)->value = v;
 			return;
 		}
@@ -113,7 +113,7 @@ void SparceMatrix<SzX, SzY, T, N>::Set(int c1, int c2, T v)
 	{
 		if (edgeY[c1].FindNode(c2, p))
 		{
-			cout << "b " << v << endl;
+			//cout << "b " << v << endl;
 			(*p)->value = v;
 			return;
 		}
@@ -123,7 +123,6 @@ void SparceMatrix<SzX, SzY, T, N>::Set(int c1, int c2, T v)
 template<int SzX, int SzY, class T, T N>
 void SparceMatrix<SzX, SzY, T, N>::Print()
 {
-	int i = 0;
 	cout << "Edge X:\n";
 	for(int i = 0; i < SzX; ++i)
 	{
@@ -138,7 +137,6 @@ void SparceMatrix<SzX, SzY, T, N>::Print()
 		edgeY[i].Print();
 	}
 	cout << endl;
-
 }
 template<int SzX, int SzY, class T, T N>
 void SparceMatrix<SzX, SzY, T, N>::Rm(int c1, int c2)
@@ -159,17 +157,17 @@ template<int SzX, int SzY, class T, T N>
 void SparceMatrix<SzX, SzY, T, N>::Ins(int c1, int c2, T v)
 {
 	SparceMatrixNode<T>* n = new SparceMatrixNode<T>(v, c1, c2);
-	cout << "Agregando valor " << n->value << endl;
-	cout << "c2:" << c2 << endl;
+	//cout << "Agregando valor " << n->value << endl;
+	//cout << "c2:" << c2 << endl;
 	edgeX[c2].InsNode(n);
 	edgeY[c1].InsNode(n);
 }
 //list
 template<class T>
-SparceMatrixList<T>::SparceMatrixList()
+SparceMatrixList<T>::SparceMatrixList(int n)
 {
-	dirección = 1;
-	cout << dirección << endl;
+	dirección = n;
+	//cout << dirección << endl;
 	head = 0;
 }
 template<class T>
@@ -189,7 +187,7 @@ template<class T>
 bool SparceMatrixList<T>::FindNode(int c, SparceMatrixNode<T>**& p)
 {
 	for (p = &head; *p; p = &(*p)->next[dirección])
-		if ((*p)->coords[dirección] == c)//dirección devuelve la coord del eje contrario
+		if ((*p)->coords[dirección] == c)//dirección devuelve la coord del eje contrario (c)
 			return true;
 	return false;
 }
@@ -199,8 +197,8 @@ bool SparceMatrixList<T>::InsNode(SparceMatrixNode<T>* n)
 {
 	SparceMatrixNode<T>** p;
 	if (FindNode(n, p))return 0;
-	cout << "no se encontro el nodo\n";
-	cout << "direccion:" << dirección << endl;
+	//cout << "no se encontro el nodo\n";
+	//cout << "direccion:" << dirección << endl;
 	n->next[dirección] = *p;
 	*p = n;
 	return 1;
@@ -219,7 +217,7 @@ void SparceMatrixList<T>::Print()
 	SparceMatrixNode<T>** p;
 	cout << '[';
 	if (head)
-		for (p = &head; *p; p = &head->next[dirección])
+		for (p = &head; *p; p = &(*p)->next[dirección])
 			cout << (*p)->value << ' ';
 	cout << ']' << endl;
 }
@@ -242,27 +240,27 @@ int main(){
 	SparceMatrix<3, 3, int, 0> mat1;
 	mat1.Set(0, 0, 1);
 	mat1.Set(0, 1, 2);
-	/*mat1.Set(0, 2, 3);
+	mat1.Set(0, 2, 3);
 	mat1.Set(1, 0, 4);
 	mat1.Set(1, 1, 5);
 	mat1.Set(1, 2, 6);
 	mat1.Set(2, 0, 7);
 	mat1.Set(2, 1, 8);
-	mat1.Set(2, 2, 9);*/
+	mat1.Set(2, 2, 9);
 
 	cout << mat1.Get(0, 0) << endl;
 	cout << mat1.Get(0, 1) << endl;
-	/*cout << mat1.Get(0, 2) << endl;
+	cout << mat1.Get(0, 2) << endl;
 	cout << mat1.Get(1, 0) << endl;
 	cout << mat1.Get(1, 1) << endl;
 	cout << mat1.Get(1, 2) << endl;
 	cout << mat1.Get(2, 0) << endl;
 	cout << mat1.Get(2, 1) << endl;
-	cout << mat1.Get(2, 2) << endl;*/
+	cout << mat1.Get(2, 2) << endl;
 
 
 
-	//mat1.Print();
+	mat1.Print();
 	return 0;
 }
 //TODO: hacer que el atributo dirección funcione , crear de forma adecuada los vectores
