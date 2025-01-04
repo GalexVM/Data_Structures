@@ -149,7 +149,7 @@ void CBinTree<T, C>::ALV(CBinTreeNode<T>* n){
             *p && (*p)==aux1;
             p = &((*p)->nodes[cmp((*p)->value, aux1->value)])
             );
-        cout << *p->value << endl;
+        cout << (*p)->value << endl;
         *p = aux2;
       
     }
